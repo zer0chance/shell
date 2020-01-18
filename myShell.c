@@ -1,5 +1,8 @@
 #include <stdio.h>
+
 #define SHELL_BUFSIZE 1024
+#define SHELL_TOK_BUFSIZE 64
+#define SHELL_TOK_DELIM " \n\t\a\r"
 
 
 char* shell_read_line()
@@ -28,7 +31,7 @@ char* shell_read_line()
 
         if (position >= bufsize) {
             bufsize += SHELL_BUFSIZE;
-            realoc(buffer, bufsize);
+            buffer = realloc(buffer, bufsize);
             if (!buffer) {
                 fprintf(stderr, "alocation error\n");
                 exit(EXIT_FAILURE);        
@@ -36,6 +39,42 @@ char* shell_read_line()
         }
     }
 }   
+
+
+char** shell_split_line(char* line)
+{
+	int bufsize = SHELL_TOKEN_BUFSIZE;
+	int position = 0;
+	char* token = NULL;
+	char** tokens = malloc(sizeof(char *) * bufsize);
+    
+	if (!tokens) {
+        fprintf(stderr, "alocation error\n");
+        exit(EXIT_FAILURE);        
+    } 
+
+	token = strtok(line, SHELL_TOK_DELIM);
+
+	while(token != NULL) {
+		tokens[position] = token;
+		position++;
+
+		if (position >= bufsize) {
+			bufsize += SHELL_TOK_BUFSIZE;	
+			tokens = realloc(tokens, bufsize * sizeof(char *));
+			 
+			if (!tokens) {
+        		fprintf(stderr, "alocation error\n");
+        		exit(EXIT_FAILURE);        
+    		}   
+		}
+		token = strtok(NULL, SHELL_TOK_DELIM);
+	}
+	
+	tokens[position] = NULL;
+	return tokens;	
+}	
+
 
 void shell_loop()
 {
