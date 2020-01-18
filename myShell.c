@@ -1,5 +1,9 @@
-#include <stdio.h>
-
+#include <sys/wait.h>
+#include <unistd.h>  
+#include <stdlib.h>   
+#include <stdio.h>   
+#include <string.h>
+      
 #define SHELL_BUFSIZE 1024
 #define SHELL_TOK_BUFSIZE 64
 #define SHELL_TOK_DELIM " \n\t\a\r"
@@ -48,7 +52,7 @@ char* shell_read_line()
 
 char** shell_split_line(char* line)
 {
-	int bufsize = SHELL_TOKEN_BUFSIZE;
+	int bufsize = SHELL_TOK_BUFSIZE;
 	int position = 0;
 	char* token = NULL;
 	char** tokens = malloc(sizeof(char *) * bufsize);
@@ -81,9 +85,9 @@ char** shell_split_line(char* line)
 }	
 
 
-int* shell_launche(char** args)
+int* shell_launch(char** args)
 {
-    pid_t = pid, wpid;
+    pid_t pid, wpid;
     int status;
 
     pid = fork();
@@ -116,15 +120,18 @@ char *builtin_str[] = {
   "exit"
 };
 
+
 int (*builtin_func[]) (char **) = {
   &shell_cd,
   &shell_help,
   &shell_exit
 };
 
+
 int shell_num_builtins() {
   return sizeof(builtin_str) / sizeof(char *);
 }
+
 
 int shell_cd(char **args)
 {
@@ -137,6 +144,7 @@ int shell_cd(char **args)
   }
   return 1;
 }
+
 
 int shell_help(char **args)
 {
@@ -151,6 +159,7 @@ int shell_help(char **args)
   return 1;
 }
 
+
 int shell_exit(char **args)
 {
   return 0;
@@ -160,7 +169,6 @@ int shell_exit(char **args)
 int shell_execute(char **args)
 {
   if (args[0] == NULL) {
-    // An empty command was entered.
     return 1;
   }
 
@@ -182,7 +190,7 @@ void shell_loop()
 
                     
     do{
-        print("> ");
+        printf("> ");
         line = shell_read_line();
         args = shell_split_line(line);
         status = shell_execute(args);
@@ -191,7 +199,6 @@ void shell_loop()
         free(args);
     } while(status);	
 }
-
 
 
 int main(int* argc, char **argv)
