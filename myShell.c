@@ -27,7 +27,7 @@ char* shell_read_line()
         position++;
 
         if (position >= bufsize) {
-            bufsize++;
+            bufsize += SHELL_BUFSIZE;
             realoc(buffer, bufsize);
             if (!buffer) {
                 fprintf(stderr, "alocation error\n");
